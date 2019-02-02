@@ -6,7 +6,7 @@ from math import sqrt
 from numba import jit
 
 MY_DIR = os.path.dirname(os.path.realpath(__file__))
-MY_CONFIG_FILE = 'starting_board_10x10.csv'
+MY_CONFIG_FILE = 'starting_board_40x40_acorn.csv'
 
 
 def display_board(board, gen):
@@ -40,6 +40,40 @@ def display_board(board, gen):
                 my_image_pixels[x, y] = pixel_color
     my_image.save(img_fname, 'png')
 
+def t_b_sidemath(board,j,i,mod):
+    if board[j][i-1] == 1:
+        neighbor_num += 1
+    if board[j+mod][i]==1:
+        neighbor_num += 1
+    if board[j+mod][i-1] == 1:
+        neighbor_num += 1
+    if board[j][i+1] == 1:
+        neighbor_num += 1
+    if board[j+mod][i+1] == 1:
+        neighbor_num += 1
+
+def cornermath(board,j,i,modj,modi):
+    if board[j][i+modi] == 1:
+        neighbor_num += 1
+
+    if board[j+modj][i]==1:
+        neighbor_num += 1
+
+    if board[j+modj][i+modi] == 1:
+        neighbor_num += 1
+
+def midsidemath(board,j,i,modi):
+    if board[j-1][i]==1:
+        neighbor_num += 1
+    if board[j+1][i]==1:
+        neighbor_num += 1
+    if board[j-1][i+modi] == 1:
+        neighbor_num += 1
+    if board[j+1][i+modi] == 1:
+        neighbor_num += 1
+    if board[j][i+modi]==1:
+        neighbor_num += 1
+
 def count_num_neighbors(board, i, j):
     """
     take the row and col and find out how many neighbors the square has
@@ -53,130 +87,65 @@ def count_num_neighbors(board, i, j):
     rows = len(board)
 
     if j == 0:#TOP ROPE
+
         if i == 0:#left, top corner
-            if board[j][i+1] == 1:
-                neighbor_num += 1
-            if board[j+1][i]==1:
-                neighbor_num += 1
-            if board[j+1][i+1] == 1:
-                neighbor_num += 1
+            modj = +1
+            modi = +1
+            neighbor_num= cornermath(board,j, i, modj, modi)
 
         if i+1 == cols:#right, top corner
-            if board[j][i-1] == 1:
-                neighbor_num += 1
-            if board[j+1][i]==1:
-                neighbor_num += 1
-            if board[j+1][i-1] == 1:
-                neighbor_num += 1
-
+            modj = +1
+            modi = -1
+            neighbor_num= cornermath(board,j, i, modj, modi)
 
         else:
             if i != 0:#top side
-                if board[j][i-1] == 1:
-                    neighbor_num += 1
-                if board[j+1][i]==1:
-                    neighbor_num += 1
-                if board[j+1][i-1] == 1:
-                    neighbor_num += 1
-
-                if board[j][i+1] == 1:
-                    neighbor_num += 1
-                if board[j+1][i+1] == 1:
-                    neighbor_num += 1
-
-
+                modj = +1
+                neighbor_num= t_b_sidemath(board,j, i, modj)
 
 
     if j + 1 == rows:#LOW GROUND
         if i == 0:#left, bottom corner
-            if board[j][i+1] == 1:
-                neighbor_num += 1
-            if board[j-1][i]==1:
-                neighbor_num += 1
-            if board[j-1][i+1] == 1:
-                neighbor_num += 1
-
-
-
+            modj = -1
+            modi = +1
+            neighbor_num= cornermath(board,j, i, modj, modi)
 
         if i+1 == cols:#right, bottom corner
-            if board[j][i-1] == 1:
-                neighbor_num += 1
-            if board[j-1][i]==1:
-                neighbor_num += 1
-            if board[j-1][i-1] == 1:
-                neighbor_num += 1
-
+            modj = -1
+            modi = -1
+            neighbor_num= cornermath(board,j, i, modj, modi)
 
         else:
             if i != 0:#bottom side
-                if board[j][i-1] == 1:
-                    neighbor_num += 1
-                if board[j-1][i]==1:
-                    neighbor_num += 1
-                if board[j-1][i-1] == 1:
-                    neighbor_num += 1
-
-                if board[j][i+1] == 1:
-                    neighbor_num += 1
-
-                if board[j-1][i+1] == 1:
-                    neighbor_num += 1
-
-
+                modj = -1
+                neighbor_num= t_b_sidemath(board,j, i, modj)
 
     if j + 1 != rows:#NORMAL
         if j != 0:
             if i == 0:#leftside
-                if board[j-1][i]==1:
-                    neighbor_num += 1
-                if board[j+1][i]==1:
-                    neighbor_num += 1
-                if board[j-1][i+1] == 1:
-                    neighbor_num += 1
-                if board[j+1][i+1] == 1:
-                    neighbor_num += 1
-                if board[j][i+1]==1:
-                    neighbor_num += 1
-
-
+                modi = +1
+                neighbor_num = midsidemath(board,j,i,modi)
 
             if i + 1 == cols:#rightside
-                if board[j-1][i]==1:
-                    neighbor_num += 1
-                if board[j+1][i]==1:
-                    neighbor_num += 1
-                if board[j-1][i-1] == 1:
-                    neighbor_num += 1
-                if board[j+1][i-1] == 1:
-                    neighbor_num += 1
-                if board[j][i-1]==1:
-                    neighbor_num += 1
-
-
+                modi = -1
+                neighbor_num = midsidemath(board,j,i,modi)
             if i != 0:
-                if i +1 != cols:
+                if i +1 != cols:#middlenorm
+
                     if board[j][i-1] == 1:
                         neighbor_num += 1
-
                     if board[j-1][i]==1:
                         neighbor_num += 1
-
                     if board[j-1][i-1] == 1:
                         neighbor_num += 1
-
                     if board[j+1][i]==1:
                         neighbor_num += 1
-
                     if board[j-1][i+1] == 1:
                         neighbor_num += 1
-
                     if board[j+1][i-1] == 1:
                         neighbor_num += 1
-
                     if board[j+1][i+1] == 1:
                         neighbor_num += 1
-
                     if board[j][i+1] == 1:
                         neighbor_num += 1
 
