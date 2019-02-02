@@ -6,7 +6,7 @@ from math import sqrt
 from numba import jit
 
 MY_DIR = os.path.dirname(os.path.realpath(__file__))
-MY_CONFIG_FILE = 'starting_board_alt_10x10.csv'
+MY_CONFIG_FILE = 'starting_board_10x10.csv'
 
 
 def display_board(board, gen):
@@ -19,17 +19,17 @@ def display_board(board, gen):
     recall that print( 'foo', end='') will prevent a newline to be printed
     TODO: iterate thru the list of lists and display each position of the board
     """
-
+    print()
+    print()
     print(f'display for generation {gen}')
     print()
     for row in board:
         print()
         for col in row:
             if col == 1:
-                print('[]', end='')
+                print('*', end='')
             if col== 0:
-                print('-', end='')
-    print()
+                print('.', end='')
 
 def count_num_neighbors(board, i, j):
     """
@@ -204,25 +204,32 @@ def update_board(board):
     """
     len_row = len(board)
     len_col = len(board[0])
+    map = []
+
 
     for i in range(len_row):
+        map.append([])
         for j in range(len_col):
 
             neighbor_num = count_num_neighbors(board, i, j)
 
             if board[i][j] == 1:
                 if neighbor_num <= 1:
-                    board[i][j] = 0
-
+                    map[i].append(0)
                 if neighbor_num >= 4:
-                    board[i][j] = 0
+                    map[i].append(0)
+                if neighbor_num == 2:
+                    map[i].append(1)
+                if neighbor_num == 3:
+                    map[i].append(1)
 
             if board[i][j] == 0:
                 if neighbor_num == 3:
-                    board[i][j] = 1
-    return board
+                    map[i].append(1)
+                else:
+                    map[i].append(0)
 
-    # TODO: modify the board to reflect the next generation
+    return map
 
 def load_board(board, infile_name):
     """
@@ -258,11 +265,12 @@ def main():
     generations_to_do = 10
 
     for i in range(generations_to_do-1):
-        update_board(board)
         display_board(board, i)
+        board = update_board(board)
+
 
     # do one final display to show end state
-    # display_board(board, i+1)
+    display_board(board, i+1)
 
 
 
