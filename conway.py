@@ -280,7 +280,8 @@ def main():
 
     # do one final display to show end state
     display_board(board, i+1)
-    print('Conways Life is finished, please check images for results')
+    print('Conways Life is finished, please check images for results.')
+    print('White is live, Black is dead')
 
 
 
