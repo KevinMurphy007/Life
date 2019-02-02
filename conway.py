@@ -19,17 +19,26 @@ def display_board(board, gen):
     recall that print( 'foo', end='') will prevent a newline to be printed
     TODO: iterate thru the list of lists and display each position of the board
     """
-    print()
-    print()
-    print(f'display for generation {gen}')
-    print()
-    for row in board:
-        print()
-        for col in row:
-            if col == 1:
-                print('*', end='')
-            if col== 0:
-                print('.', end='')
+    my_image = Image.new('RGB', (len(board[0]),len(board)))
+    my_image_pixels = my_image.load()
+    img_fname = os.path.dirname(os.path.realpath(__file__)) + '/' + f'generation{gen}.png'
+    # get the image size
+    image_x_size = my_image.size[0]
+    image_y_size = my_image.size[1]
+    # iterate over x and y to pick the pixel color
+    for y in range(image_y_size):
+
+        for x in range(image_x_size):
+
+            if board[y][x] == 1:
+                pixel_color = (255,255,255)
+
+                my_image_pixels[x, y] = pixel_color
+            if board[y][x] == 0:
+                pixel_color =(0,0,0)
+
+                my_image_pixels[x, y] = pixel_color
+    my_image.save(img_fname, 'png')
 
 def count_num_neighbors(board, i, j):
     """
@@ -38,7 +47,7 @@ def count_num_neighbors(board, i, j):
     temp_num = j
     j = i
     i = temp_num
-
+#j and i are swapped because the code below is backwards
     neighbor_num=0
     cols = len(board[0])
     rows = len(board)
@@ -228,8 +237,8 @@ def update_board(board):
                     map[i].append(1)
                 else:
                     map[i].append(0)
-
-    return map
+    board = map
+    return board
 
 def load_board(board, infile_name):
     """
@@ -266,11 +275,12 @@ def main():
 
     for i in range(generations_to_do-1):
         display_board(board, i)
-        board = update_board(board)
+        board =update_board(board)
 
 
     # do one final display to show end state
     display_board(board, i+1)
+    print('Conways Life is finished, please check images for results')
 
 
 
